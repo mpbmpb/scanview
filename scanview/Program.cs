@@ -24,7 +24,7 @@ namespace scanview
         {
             List<string> result = new List<string>();
             string[] hits = new string[entity.Length];
-            string[] view = File.ReadAllLines($"Views/{viewName}/Index.cshtml");
+            string[] view = File.ReadAllLines($"../../../../scanview/Views/{viewName}/Index.cshtml");
             for (int line = 0; line < view.Length; line++)
             {
                 for (int i = 0; i < entity.Length; i++)
