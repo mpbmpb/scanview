@@ -36,7 +36,7 @@ namespace scanview
 
         private static List<string> VariationsOf(string entity)
         {
-            return new List<string> {$".{entity}.", $".{entity} ", $".{entity}\"", $".{entity}>", $"<{entity}>" };
+            return new List<string> {$".{entity}.", $".{entity} ", $".{entity}\"", $".{entity}>", $"<{entity}>", $"type = \"hidden\" asp-for= \"{entity}Id\"" };
         }
 
         private static readonly string[] entity = new string[]
