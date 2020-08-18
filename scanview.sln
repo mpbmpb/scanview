@@ -1,0 +1,23 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scanview", "scanview\scanview.csproj", "{96D85078-6C4C-4AA0-BCA2-584E9E9A52E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scanview.tests", "scanview.tests\scanview.tests.csproj", "{10E2CBC0-1CF4-4183-BB24-FD7BB0BCCB23}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{96D85078-6C4C-4AA0-BCA2-584E9E9A52E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96D85078-6C4C-4AA0-BCA2-584E9E9A52E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96D85078-6C4C-4AA0-BCA2-584E9E9A52E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96D85078-6C4C-4AA0-BCA2-584E9E9A52E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10E2CBC0-1CF4-4183-BB24-FD7BB0BCCB23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10E2CBC0-1CF4-4183-BB24-FD7BB0BCCB23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10E2CBC0-1CF4-4183-BB24-FD7BB0BCCB23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10E2CBC0-1CF4-4183-BB24-FD7BB0BCCB23}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
