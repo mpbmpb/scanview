@@ -9,10 +9,8 @@ namespace scanview
     {
         static void Main(string[] args)
         {
-            var result = FindEntities("Subject");
-            Array.ForEach(result, Console.WriteLine);
-            Console.ReadLine();
-
+            var result = FindEntities("Venue", "Index");
+            result.ForEach(Console.WriteLine);
         }
         public static void printClassName(Type T)
         {
@@ -20,25 +18,30 @@ namespace scanview
         }
 
 
-        public static string[] FindEntities(string viewName)
+        public static List<string> FindEntities(string controllerName, string viewName)
         {
             List<string> result = new List<string>();
             string[] hits = new string[entity.Length];
-            string[] view = File.ReadAllLines($"../../../../scanview/Views/{viewName}/Index.cshtml");
+            string[] view = File.ReadAllLines($"../../../../scanview/Views/{controllerName}/{viewName}.cshtml");
             for (int line = 0; line < view.Length; line++)
             {
-                for (int i = 0; i < entity.Length; i++)
+                for (int current = 0; current < entity.Length; current++)
                 {
-                    if (view[line].Contains(entity[i])) { hits[i] = entity[i]; }
-
+                    if (VariationsOf(entity[current]).Any(view[line].Contains)) { hits[current] = entity[current]; }
                 }
             }
-            return hits;
+            foreach (var hit in hits) { if (hit != null) { result.Add(hit); } }
+            return result;
+        }
+
+        private static List<string> VariationsOf(string entity)
+        {
+            return new List<string> {$".{entity}.", $".{entity} ", $".{entity}\"", $".{entity}>", $"<{entity}>" };
         }
 
         private static readonly string[] entity = new string[]
         {
-            "Subject", "Day", "Contact"
+            "Course", "CourseDesign", "Seminar", "Day", "Subject", "CourseDate", "Venue", "Contact"
         };
     }
 }

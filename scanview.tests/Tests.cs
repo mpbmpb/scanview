@@ -7,22 +7,16 @@ namespace scanview.tests
 {
     public class Tests
     {
-        [Fact]
-        public void FindEntities_finds_Contact_in_ContactIndex()
+        [Theory]
+        [InlineData("Subject", "Index", new string[] { "Day", "Subject" })]
+        [InlineData("Contact", "Index", new string[] {"Contact"})]
+        [InlineData("CourseDesign", "index", new string[] {"CourseDesign", "Seminar", "Day", "Subject"})]
+        public void FindEntities_finds_all_entities_in_controller_View(string controller, string view, string[] expected)
         {
-            var result = Program.FindEntities("Contact");
+            var result = Program.FindEntities(controller, view);
 
-            result.Should().Contain("Contact");
-        }
-
-        [Fact]
-        public void FindEntities_finds_Subject_and_Day_in_SubjectIndex()
-        {
-            var result = Program.FindEntities("Subject");
-
-            //result.Should().Contain(x => x != null).Which.Should();
-            result.Should().Contain("Day");
-            result.Should().Contain("Subject");
+            result.Should().Contain(expected);
+            result.Should().HaveCount(expected.Length);
 
         }
 
