@@ -46,26 +46,3 @@ namespace scanview
         };
     }
 }
-
-//static void printArray(int[][] s)
-//{
-//    foreach(int[] arr in s)
-//    {
-//        foreach (int n in arr)
-//        {
-//            Console.Write(n + ", ");
-//        }
-//        Console.WriteLine();
-//    }
-//}
-//int[][] s = new int[3][];
-
-//            for (int i = 0; i< 3; i++)
-//            {
-//                s[i] = Array.ConvertAll(Console.ReadLine().Split(' '), sTemp => Convert.ToInt32(sTemp));
-//            }
-
-//public static string ReverseString(string numberStr)
-//{
-//    return new string(numberStr.Reverse().ToArray());
-//}
