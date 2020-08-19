@@ -22,14 +22,13 @@ namespace scanview
         {
             List<string> result = new List<string>();
             string[] hits = new string[relatedEntities.Length];
-            string[] view = File.ReadAllLines($"../../../../scanview/Views/{controllerName}/{viewName}.cshtml");
-            for (int line = 0; line < view.Length; line++)
+            string view = File.ReadAllText($"../../../../scanview/Views/{controllerName}/{viewName}.cshtml");
+         
+            for (int current = 0; current < relatedEntities.Length; current++)
             {
-                for (int current = 0; current < relatedEntities.Length; current++)
-                {
-                    if (VariationsOf(relatedEntities[current]).Any(view[line].Contains)) { hits[current] = relatedEntities[current]; }
-                }
+                if (VariationsOf(relatedEntities[current]).Any(view.Contains)) { hits[current] = relatedEntities[current]; }
             }
+            
             int smallestEntityInChain = Array.IndexOf(relatedEntities, "Subject");
             int controllerIndex = Array.IndexOf(relatedEntities, controllerName);
             // if controller is in range course -> subject should return only controller & smallest entity
@@ -57,8 +56,9 @@ namespace scanview
 
         private static List<string> VariationsOf(string entity)
         {
-            return new List<string> {$".{entity}.", $".{entity} ", $".{entity}\"", $".{entity}>", $"<{entity}>",
-                $"type=\"hidden\" asp-for=\"{entity}Id\"" };
+            return new List<string> {$".{entity}.", $".{entity} ", $".{entity}\r\n",
+                $".{entity}\r", $".{entity}\n", $".{entity}\"", $".{entity}>", $"<{entity}>",
+                $"ViewBag.{entity}Id", $"ViewData.{entity}Id", $"type=\"hidden\" asp-for=\"{entity}Id\"" };
         }
 
         private static readonly string[] relatedEntities = new string[]
