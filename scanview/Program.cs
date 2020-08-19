@@ -58,7 +58,10 @@ namespace scanview
         {
             return new List<string> {$".{entity}.", $".{entity} ", $".{entity}\r\n",
                 $".{entity}\r", $".{entity}\n", $".{entity}\"", $".{entity}>", $"<{entity}>",
-                $"ViewBag.{entity}Id", $"ViewData.{entity}Id", $"type=\"hidden\" asp-for=\"{entity}Id\"" };
+                $"ViewBag.{entity}Id", $"ViewData.{entity}Id", $"@model {entity} ",
+                $"@model {entity}\r\n", $"@model {entity}\r", $"@model {entity}\n",
+                $"type=\"hidden\" asp-for=\"{entity}Id\"", $"type=\"hidden\" asp-for=\"{entity}.",
+                $"type=\"hidden\" asp-for=\"{entity}\""};
         }
 
         private static readonly string[] relatedEntities = new string[]
