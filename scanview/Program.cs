@@ -12,11 +12,6 @@ namespace scanview
             var result = FindEntities("Venue", "Index");
             result.ForEach(Console.WriteLine);
         }
-        public static void printClassName(Type T)
-        {
-
-        }
-
 
         public static List<string> FindEntities(string controllerName, string viewName)
         {
@@ -31,8 +26,6 @@ namespace scanview
             
             int smallestEntityInChain = Array.IndexOf(relatedEntities, "Subject");
             int controllerIndex = Array.IndexOf(relatedEntities, controllerName);
-            // if controller is in range course -> subject should return only controller & smallest entity
-            // all entities outside the range or bigger than controller should be added to list.
             if (controllerIndex <= smallestEntityInChain)
             {
                 bool smallerEntityFound = false;
