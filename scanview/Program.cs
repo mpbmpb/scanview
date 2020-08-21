@@ -34,10 +34,6 @@ namespace scanview
             new string [] { "Course", "CourseDates", "CourseDate", "Venue", "Contact" }
         };
 
-        //TODO  violates srp, should just find
-        //      create sort function & returnEntities should be main function that calls the others
-        //                                          should be One param controllerViewName i.e. "Day/Index"
-
         public static List<List<string>> GetRelevantEntities(string controllerViewName)
         {
             var result = FindEntities(controllerViewName)
@@ -100,19 +96,19 @@ namespace scanview
 
         public static void RemoveUnnessesaryDoubles(this List<List<string>> list)
         {
-            for (int row = list.Count - 1; row > 0; row--)
+            for (int row = list.Count - 1; row >= 0; row--)
             {
                 if (list[row].Count == 1)
                 {
                     string entity = list[row][0];
-                    for (int i = 0; i < row; i++)
+                    for (int i = 0; i < list.Count; i++)
                     {
-                        if (list[i].Contains(entity)) list[row].Remove(entity);
+                        if (i != row && list[i].Contains(entity)) list[row].Remove(entity);
                     }
                 }
             }
         }
-        // if entity has pluralform substring then belongs to entity to the left of said plural
+
         public static List<List<string>> ReturnGrouped(this List<string> list)
         {
             List<List<string>> result = new List<List<string>>();
@@ -122,8 +118,6 @@ namespace scanview
             }
             foreach (string entity in list)
             {
-                //find index of your row(s), if string with corresponding index in result is empty create new string
-                //else check previous entry in string and complete chain (add yourself and any missing intermediates)
                 var rows = navigationRelations.GetRowNumbersFor(entity);
                 foreach (int row in rows)
                 {
@@ -131,8 +125,6 @@ namespace scanview
                     else result[row].AddPathTo(row, entity);
                 }
             }
-            //check if string in result consists of 1 entity that entity is unique else remove that string
-            //substring(.entity or entity.) or exact match
             return result;
         }
     }
