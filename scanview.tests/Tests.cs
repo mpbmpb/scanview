@@ -45,11 +45,8 @@ namespace scanview.tests
         public void FindEntities_returns_entities_in_proper_order(string controller, string view, string[] expected)
         {
             var result = Program.FindEntities(controller, view);
-
-            for (int i = 0; i < expected.Length; i++)
-            {
-                result.Should().BeEquivalentTo(expected);
-            }
+          
+            result.Should().Equal(expected);
         }
     }
 }
