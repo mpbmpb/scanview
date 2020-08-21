@@ -28,19 +28,28 @@ namespace scanview
             "Course", "CourseDates", "CourseDesign", "CourseSeminars", "Seminar", "SeminarDays", "Day", "DaySubjects", "Subject", "CourseDate", "Venue", "Contact"
         };
 
-        private static readonly string[][] navigationRelations = new string[][]
+        private static readonly string[][] dataModel = new string[][]
         {
             new string [] { "Course", "CourseDesign", "CourseSeminars", "Seminar", "SeminarDays", "Day", "DaySubjects", "Subject" },
             new string [] { "Course", "CourseDates", "CourseDate", "Venue", "Contact" }
         };
 
+        private static List<string> VariationsOf(string entity)
+        {
+            return new List<string> {$".{entity}.", $".{entity} ", $".{entity})", $".{entity}\r\n",
+                $".{entity}\r", $".{entity}\n", $".{entity}\"", $".{entity}>", $"<{entity}>",
+                $"ViewBag.{entity}Id", $"ViewData.{entity}Id", $"@model {entity} ",
+                $"@model {entity}\r\n", $"@model {entity}\r", $"@model {entity}\n",
+                $"type=\"hidden\" asp-for=\"{entity}Id\"", $"type=\"hidden\" asp-for=\"{entity}.",
+                $"type=\"hidden\" asp-for=\"{entity}\""};
+        }
+
         public static List<List<string>> GetRelevantEntities(string controllerViewName)
         {
             var result = FindEntities(controllerViewName)
-                .ReturnGrouped();
+                .OrderByDataModel();
 
             result.RemoveUnnessesaryDoubles();
-            result.RemoveAll(item => item.Count == 0);
             return result;
         }
 
@@ -57,15 +66,6 @@ namespace scanview
             return result;
         }
 
-        private static List<string> VariationsOf(string entity)
-        {
-            return new List<string> {$".{entity}.", $".{entity} ", $".{entity})", $".{entity}\r\n",
-                $".{entity}\r", $".{entity}\n", $".{entity}\"", $".{entity}>", $"<{entity}>",
-                $"ViewBag.{entity}Id", $"ViewData.{entity}Id", $"@model {entity} ",
-                $"@model {entity}\r\n", $"@model {entity}\r", $"@model {entity}\n",
-                $"type=\"hidden\" asp-for=\"{entity}Id\"", $"type=\"hidden\" asp-for=\"{entity}.",
-                $"type=\"hidden\" asp-for=\"{entity}\""}; //should regex this
-        }
         public static bool ContainsAny(this string input, List<string> searchStrings)
         {
             foreach (string searchTerm in searchStrings)
@@ -73,7 +73,31 @@ namespace scanview
             return false;
         }
 
-        public static int[] GetRowNumbersFor(this string[][] input, string searchTerm)
+        public static List<List<string>> OrderByDataModel(this List<string> list)
+        {
+            List<List<string>> orderedResult = GetListOfRightDimensions();
+
+            foreach (string entity in list)
+            {
+                var rows = dataModel.RowNumbersWhereAppears(entity);
+                foreach (int row in rows)
+                {
+                    if (orderedResult[row].Count == 0) orderedResult[row].Add(entity);
+                    else orderedResult[row].ConnectPathTo(row, entity);
+                }
+            }
+            return orderedResult;
+        }
+
+        public static List<List<string>> GetListOfRightDimensions()
+        {
+            List<List<string>> list = new List<List<string>>();
+            foreach (var row in dataModel)
+                list.Add(new List<string>());
+            return list;
+        }
+
+        public static int[] RowNumbersWhereAppears(this string[][] input, string searchTerm)
         {
             int[] result = new int[input.Length];
             for (int row = 0; row < input.Length; row++)
@@ -81,22 +105,21 @@ namespace scanview
             return result;
         }
 
-        public static List<string> AddPathTo(this List<string> list, int row, string entity)
+        public static List<string> ConnectPathTo(this List<string> list, int row, string lastEntity)
         {
-            string lastEntityInResult = list[list.Count - 1];
-            int entityIndex = Array.IndexOf(navigationRelations[row], lastEntityInResult);
-            int startIndex = entityIndex + 1;
-            int endIndex = Array.IndexOf(navigationRelations[row], entity);
-            for (int index = startIndex; index <= endIndex; index++)
+            string startAtEntity = list[list.Count - 1];
+            int startIndex = Array.IndexOf(dataModel[row], startAtEntity) + 1;
+            int lastIndex = Array.IndexOf(dataModel[row], lastEntity);
+            for (int index = startIndex; index <= lastIndex; index++)
             {
-                list.Add(navigationRelations[row][index]);
+                list.Add(dataModel[row][index]);
             }
             return list;
         }
 
         public static void RemoveUnnessesaryDoubles(this List<List<string>> list)
         {
-            for (int row = list.Count - 1; row >= 0; row--)
+            for (int row = 0; row < list.Count; row++)
             {
                 if (list[row].Count == 1)
                 {
@@ -107,25 +130,7 @@ namespace scanview
                     }
                 }
             }
-        }
-
-        public static List<List<string>> ReturnGrouped(this List<string> list)
-        {
-            List<List<string>> result = new List<List<string>>();
-            foreach (var row in navigationRelations)
-            {
-                result.Add(new List<string>());
-            }
-            foreach (string entity in list)
-            {
-                var rows = navigationRelations.GetRowNumbersFor(entity);
-                foreach (int row in rows)
-                {
-                    if (result[row].Count == 0) result[row].Add(entity);
-                    else result[row].AddPathTo(row, entity);
-                }
-            }
-            return result;
+            list.RemoveAll(item => item.Count == 0);
         }
     }
 }
