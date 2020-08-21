@@ -10,8 +10,14 @@ namespace scanview
     {
         static void Main(string[] args)
         {
-            var result = Extensions.GetRelevantEntities("Course/Index");
-            result.ForEach(Console.WriteLine);
+            var result = Extensions.GetRelevantEntities("Course/Details");
+            int count = 1;
+            foreach (var list in result)
+            {
+                Console.WriteLine($"List{count}");
+                list.ForEach(Console.WriteLine);
+                count++;
+            }
         }       
     }
 
@@ -32,10 +38,14 @@ namespace scanview
         //      create sort function & returnEntities should be main function that calls the others
         //                                          should be One param controllerViewName i.e. "Day/Index"
 
-        public static List<string> GetRelevantEntities(string controllerViewName)
+        public static List<List<string>> GetRelevantEntities(string controllerViewName)
         {
-            return FindEntities(controllerViewName);
+            var result = FindEntities(controllerViewName)
+                .ReturnGrouped();
 
+            result.RemoveUnnessesaryDoubles();
+            result.RemoveAll(item => item.Count == 0);
+            return result;
         }
 
         public static List<string> FindEntities(string controllerViewName)
@@ -67,52 +77,63 @@ namespace scanview
             return false;
         }
 
-        public static int[] GetRowNumberFor(this string[][] input, string searchTerm)
+        public static int[] GetRowNumbersFor(this string[][] input, string searchTerm)
         {
             int[] result = new int[input.Length];
             for (int row = 0; row < input.Length; row++)
-                if (input[row].Contains(searchTerm)) result[row] = 1;
+                if (input[row].Contains(searchTerm)) result[row] = row;
             return result;
         }
 
-        // if entity has pluralform substring then belongs to entity to the left of said plural
-        public static List<string> ReturnGrouped(this List<string> list)
+        public static List<string> AddPathTo(this List<string> list, int row, string entity)
         {
-            List<string> result = new List<string>();
+            string lastEntityInResult = list[list.Count - 1];
+            int entityIndex = Array.IndexOf(navigationRelations[row], lastEntityInResult);
+            int startIndex = entityIndex + 1;
+            int endIndex = Array.IndexOf(navigationRelations[row], entity);
+            for (int index = startIndex; index <= endIndex; index++)
+            {
+                list.Add(navigationRelations[row][index]);
+            }
+            return list;
+        }
+
+        public static void RemoveUnnessesaryDoubles(this List<List<string>> list)
+        {
+            for (int row = list.Count - 1; row > 0; row--)
+            {
+                if (list[row].Count == 1)
+                {
+                    string entity = list[row][0];
+                    for (int i = 0; i < row; i++)
+                    {
+                        if (list[i].Contains(entity)) list[row].Remove(entity);
+                    }
+                }
+            }
+        }
+        // if entity has pluralform substring then belongs to entity to the left of said plural
+        public static List<List<string>> ReturnGrouped(this List<string> list)
+        {
+            List<List<string>> result = new List<List<string>>();
+            foreach (var row in navigationRelations)
+            {
+                result.Add(new List<string>());
+            }
             foreach (string entity in list)
             {
                 //find index of your row(s), if string with corresponding index in result is empty create new string
                 //else check previous entry in string and complete chain (add yourself and any missing intermediates)
-                navigationRelations.GetRowNumberFor(entity);
+                var rows = navigationRelations.GetRowNumbersFor(entity);
+                foreach (int row in rows)
+                {
+                    if (result[row].Count == 0) result[row].Add(entity);
+                    else result[row].AddPathTo(row, entity);
+                }
             }
             //check if string in result consists of 1 entity that entity is unique else remove that string
             //substring(.entity or entity.) or exact match
+            return result;
         }
     }
 }
-
-//TODO code smell too many conditionals..polymorphism?
-
-//            string[] hits = new string[entities.Length];
-
-//int smallestEntityInChain = Array.IndexOf(entities, "Subject");
-//int controllerIndex = Array.IndexOf(entities, controllerName);
-//if (controllerIndex <= smallestEntityInChain)
-//{
-//    bool smallerEntityFound = false;
-//    result.Add(hits[controllerIndex]);
-//    hits[controllerIndex] = null;
-//    for (int index = smallestEntityInChain; index > controllerIndex; index--)
-//    {
-//        if (smallerEntityFound) { hits[index] = null; }
-//        if (hits[index] != null && !smallerEntityFound)
-//        {
-//            result.Add(hits[index]);
-//            hits[index] = null;
-//            smallerEntityFound = true;
-//        }
-//    }
-//}
-
-//foreach (var hit in hits) { if (hit != null) { result.Add(hit); } }
-//return result;
