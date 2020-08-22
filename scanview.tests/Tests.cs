@@ -21,19 +21,26 @@ namespace scanview.tests
         [InlineData("Venue/Create", new string[] { "Venue" })]
         public void FindEntities_returns_entities_in_proper_order(string controllerview, string[] output)
         {
-            var result = Extensions.GetRelevantEntities(controllerview);
+            var dataModel = new DataModel();
+            var viewScanner = new ViewScanner(dataModel);
+
+            var result = viewScanner.GetRelatedEntities(controllerview);
 
             var list = new List<string>();
             foreach (var item in output) list.Add(item);
             var expected = new List<List<string>> { list };
 
             result[0].Should().Equal(expected[0]);
+            result.Should().HaveCount(1);
         }
 
         [Fact]
         public void FindEntities_returns_entitylists_grouped_by_lineage()
         {
-            var result = Extensions.GetRelevantEntities("Course/Details");
+            var dataModel = new DataModel();
+            var viewScanner = new ViewScanner(dataModel);
+
+            var result = viewScanner.GetRelatedEntities("Course/Details");
 
             var expected = new List<List<string>>{
                 new List<string> { "Course", "CourseDesign", "CourseSeminars", "Seminar", "SeminarDays", "Day", "DaySubjects", "Subject" },
@@ -42,6 +49,7 @@ namespace scanview.tests
 
             result[0].Should().Equal(expected[0]);
             result[1].Should().Equal(expected[1]);
+            result.Should().HaveCount(2);
 
         }
     }
