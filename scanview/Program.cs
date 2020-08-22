@@ -25,7 +25,7 @@ namespace scanview
                 count++;
             }
 
-            dataModel.Build();
+            dataModel.Build<SchoolContext>();
         }
     }
 
@@ -41,9 +41,9 @@ namespace scanview
 
         internal readonly string path = "../../../../scanview/Views/";
 
-        public void Build()
+        public void Build<T>() where T : class//srp should only build, ask for blocks with methods
         {
-            var contextProperties = typeof(SchoolContext).GetProperties()
+            var contextProperties = typeof(T).GetProperties()
                 .Where(x => x.PropertyType.IsGenericType && x.PropertyType.Name
                 .Contains("DbSet")).ToArray();
             List<Type> TypeList = new List<Type>();
@@ -52,11 +52,6 @@ namespace scanview
                 var gen = type.PropertyType.GetGenericArguments()[0];
                 TypeList.Add(gen);
             }
-            foreach (var t in TypeList) Console.WriteLine(t);
-            Console.WriteLine("-----------------------------------");
-            Console.WriteLine($"Count = {contextProperties.Length}");
-
-            Console.WriteLine("-----------------------------------");
 
             int[][] relationModel = new int[TypeList.Count][];
             for (int i = 0; i < TypeList.Count; i++)
@@ -81,11 +76,6 @@ namespace scanview
 
                 relationModel[i] = navigationPropertyPointers;
             }
-            Console.WriteLine($"relationModel row 1 has {relationModel[0].Length} entries.");
-            Console.WriteLine($"relationModel row 2 has {relationModel[1].Length} entries.");
-            Console.WriteLine($"relationModel row 3 has {relationModel[2].Length} entries.");
-            Console.WriteLine($"relationModel row 4 has {relationModel[3].Length} entries.");
-            Console.WriteLine($"relationModel row 5 has {relationModel[4].Length} entries.");
         }
     }
 
