@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using scanview.Models;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 namespace scanview
 {
+    using scanview.Models;
+
     public class Program
     {
         static void Main(string[] args)
@@ -21,6 +24,8 @@ namespace scanview
                 list.ForEach(Console.WriteLine);
                 count++;
             }
+
+            dataModel.Build();
         }
     }
 
@@ -35,6 +40,53 @@ namespace scanview
         };
 
         internal readonly string path = "../../../../scanview/Views/";
+
+        public void Build()
+        {
+            var contextProperties = typeof(SchoolContext).GetProperties()
+                .Where(x => x.PropertyType.IsGenericType && x.PropertyType.Name
+                .Contains("DbSet")).ToArray();
+            List<Type> TypeList = new List<Type>();
+            foreach (var type in contextProperties)
+            {
+                var gen = type.PropertyType.GetGenericArguments()[0];
+                TypeList.Add(gen);
+            }
+            foreach (var t in TypeList) Console.WriteLine(t);
+            Console.WriteLine("-----------------------------------");
+            Console.WriteLine($"Count = {contextProperties.Length}");
+
+            Console.WriteLine("-----------------------------------");
+
+            int[][] relationModel = new int[TypeList.Count][];
+            for (int i = 0; i < TypeList.Count; i++)
+            {  
+                var genericProperties = TypeList[i].GetProperties()
+                    .Where(x => x.PropertyType.IsGenericType
+                    && TypeList.Contains(x.PropertyType.GetGenericArguments()[0])).ToArray();
+                var nonGenericProperties = TypeList[i].GetProperties()
+                    .Where(x => TypeList.Contains(x.PropertyType)).ToArray();
+
+                int[] navigationPropertyPointers = new int[genericProperties.Length + nonGenericProperties.Length];
+                for (int index = 0; index < genericProperties.Length; index++)
+                {
+                    navigationPropertyPointers[index] = TypeList.IndexOf(genericProperties[index]
+                                                        .PropertyType.GetGenericArguments()[0]);
+                }
+                for (int index = 0; index < nonGenericProperties.Length; index++)
+                {
+                    navigationPropertyPointers[index + genericProperties.Length] = TypeList
+                        .IndexOf(nonGenericProperties[index].PropertyType);
+                }
+
+                relationModel[i] = navigationPropertyPointers;
+            }
+            Console.WriteLine($"relationModel row 1 has {relationModel[0].Length} entries.");
+            Console.WriteLine($"relationModel row 2 has {relationModel[1].Length} entries.");
+            Console.WriteLine($"relationModel row 3 has {relationModel[2].Length} entries.");
+            Console.WriteLine($"relationModel row 4 has {relationModel[3].Length} entries.");
+            Console.WriteLine($"relationModel row 5 has {relationModel[4].Length} entries.");
+        }
     }
 
     public class ViewScanner
