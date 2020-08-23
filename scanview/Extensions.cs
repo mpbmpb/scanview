@@ -49,5 +49,29 @@ namespace scanview
             list.RemoveAll(item => item.Count == 0);
             return list;
         }
+
+        public static List<List<Type>> Absorb(this List<List<Type>> matrix, List<Type> rowToFit)
+        {
+            bool isInMatrix = false;
+            bool fitsInExistingRow = false;
+            int fragmentSize = rowToFit.Count;
+            if (matrix.Count == 0 )
+            {
+                matrix.Add(rowToFit);
+                return matrix;
+            }
+            foreach (var row in matrix)
+            {
+                int item = 0;
+                int index = 0;
+                for (int i = index; index < row.Count; index++)
+                {
+                    if (row[index] == rowToFit[item]) item++;
+
+                }
+            }
+
+            return matrix;
+        }
     }
 }

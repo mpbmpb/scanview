@@ -25,6 +25,7 @@ namespace scanview
         {
             BuildTypeList<T>();
             BuildNavigationRelations();
+            BuildNavigationPaths();
         }
 
         private void BuildTypeList<T>()
@@ -63,9 +64,12 @@ namespace scanview
             {
                 var row = new List<Type>();
                 row.Add(Entities[entity]);
-                foreach (var referral in NavigationRelations[entity].Where(e => !row.Contains(e)))
+                var referrals = NavigationRelations[entity].Where(e => !row.Contains(e)).ToList();
+                foreach (var referral in referrals)
                 {
-
+                    row.Add(referral);
+                    path.Absorb(row);
+                    row.Remove(referral);
                 }
 
             }
