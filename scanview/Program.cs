@@ -41,17 +41,25 @@ namespace scanview
 
         internal readonly string path = "../../../../scanview/Views/";
 
+        public List<Type> TypeList = new List<Type>();
+        public int[][] TypeRelations;
+
         public void Build<T>() where T : class//srp should only build, ask for blocks with methods
         {
-            var contextProperties = typeof(T).GetProperties()
-                .Where(x => x.PropertyType.IsGenericType && x.PropertyType.Name
-                .Contains("DbSet")).ToArray();
-            List<Type> TypeList = new List<Type>();
-            foreach (var type in contextProperties)
+            BuildTypeList();
+
+            void BuildTypeList()
             {
-                var gen = type.PropertyType.GetGenericArguments()[0];
-                TypeList.Add(gen);
+                var contextProperties = typeof(T).GetProperties()
+                .Where(x => x.PropertyType.IsGenericType && x.PropertyType.Name.Contains("DbSet"))
+                .ToArray();
+                foreach (var type in contextProperties)
+                {
+                    var gen = type.PropertyType.GetGenericArguments()[0];
+                    TypeList.Add(gen);
+                }
             }
+            
 
             int[][] relationModel = new int[TypeList.Count][];
             for (int i = 0; i < TypeList.Count; i++)
@@ -76,6 +84,7 @@ namespace scanview
 
                 relationModel[i] = navigationPropertyPointers;
             }
+            TypeRelations = relationModel;
         }
     }
 
