@@ -62,7 +62,7 @@ namespace scanview.tests
                 typeof(CourseDate), typeof(Venue), typeof(Contact)};
 
             dataModel.Build<SchoolContext>();
-            var result = dataModel.TypeList;
+            var result = dataModel.Entities;
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -84,11 +84,9 @@ namespace scanview.tests
             var dataModel = new DataModel();
 
             dataModel.Build<SchoolContext>();
-            int DayIndex = dataModel.TypeList.IndexOf(entity);
-            var result = new List<Type>();
-            foreach (int reference in dataModel.TypeRelations[DayIndex])
-                result.Add(dataModel.TypeList[reference]);
-
+            int entityIndex = dataModel.Entities.IndexOf(entity);
+            var result = dataModel.NavigationRelations[entityIndex];
+  
             result.Should().BeEquivalentTo(expected);
         }
     }
