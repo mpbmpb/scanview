@@ -36,46 +36,57 @@ namespace scanview
                 new List<string> { "four", "three", "one" },
                 new List<string> { "five", "four", "three"},
                 new List<string> { "five", "four", "three", "one" },
+                new List<string> { "five", "four", "three", "two", "one", "zero" },
+                new List<string> { "six", "five", "four", "three", "two", "one" },
             };
             var List = new List<string> { "two", "three", "four", "five", "six" };
 
-            int counter = 0;
+            int counter = -1;
             foreach (var row in matrix)
             {
+                counter++;
                 if (row.Count <= List.Count)
                 {
-                    row.Print();
-                    int matchIndex = 0;
-                    bool Match = row.IsSubsetOf(List);
-                    bool PartialMatch = false;
-                    if (!Match)
-                    {
-                        for (int i = 1; i < row.Count; i++)
-                        {
-                            if (List.StartsOrEndsWith(row.GetRange(i, row.Count - i)))
-                            {
-                                matchIndex = i;
-                                row.Print();
-                                PartialMatch = true;
-                                break;
-                            }
-                            row.Reverse();
-                            if (List.StartsOrEndsWith(row.GetRange(i, row.Count - i)))
-                            {
-                                matchIndex = i;
-                                row.Print();
-                                PartialMatch = true;
-                                break;
-                            }
-
-                        }
-                    }
-                    if (Match) Console.WriteLine($"row {counter} matches.");
-                    if (PartialMatch) Console.WriteLine($"row {counter} has partial match at index {matchIndex}");
+                    if (row.IsSubsetOf(List)) continue;
+                    FindMatch(row, List);
                 }
-                // TODO do thesame as section above but switch row and List
+                else
+                {
+                    if (List.IsSubsetOf(row))
+                    {
+                        Console.WriteLine("List = row");
+                        continue;
+                    }
+                    FindMatch(List, row);
+                }
                 Console.WriteLine("--------------------------------------");
-                counter++;
+            }
+
+            void FindMatch(List<string> row, List<string> List)
+            {
+                row.Print();
+                int matchIndex = 0;
+                bool PartialMatch = false;
+                    for (int i = 1; i < row.Count; i++)
+                    {
+                        if (List.StartsOrEndsWith(row.GetRange(i, row.Count - i)))
+                        {
+                            matchIndex = i;  //TODO make function that deals with match & partial match
+                            row.Print();    //      match -> largest list survives, partial -> concat
+                            PartialMatch = true;
+                            break;
+                        }
+                        row.Reverse();
+                        if (List.StartsOrEndsWith(row.GetRange(i, row.Count - i)))
+                        {
+                            matchIndex = i;
+                            row.Print();
+                            PartialMatch = true;
+                            break;
+                        }
+
+                    }
+                if (PartialMatch) Console.WriteLine($"row {counter} has partial match at index {matchIndex}");
             }
         }
     }
